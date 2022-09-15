@@ -1,36 +1,36 @@
 import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { OrbitControls } from "@three-ts/orbit-controls";
 import { A, D, DIRECTIONS, S, W } from "./keys";
 
 export class Controller {
-  model;
-  mixer;
-  animationsMap = new Map(); // Walk, Run, Idle
-  orbitControl;
-  camera;
+  model: THREE.Group;
+  mixer: THREE.AnimationMixer;
+  animationsMap: Map<string, THREE.AnimationAction> = new Map(); // Walk, Run, Idle
+  orbitControl: OrbitControls;
+  camera: THREE.Camera;
 
   // state
-  toggleRun= true;
-  currentAction;
+  toggleRun: boolean = true;
+  currentAction: string;
 
   // temporary data
   walkDirection = new THREE.Vector3();
   rotateAngle = new THREE.Vector3(0, 1, 0);
-  rotateQuarternion = new THREE.Quaternion();
+  rotateQuarternion: THREE.Quaternion = new THREE.Quaternion();
   cameraTarget = new THREE.Vector3();
 
   // constants
-  fadeDuration= 0.2;
+  fadeDuration: number = 0.2;
   runVelocity = 5;
   walkVelocity = 2;
 
   constructor(
-    model,
-    mixer,
-    animationsMap,
-    orbitControl,
-    camera,
-    currentAction,
+    model: THREE.Group,
+    mixer: THREE.AnimationMixer,
+    animationsMap: Map<string, THREE.AnimationAction>,
+    orbitControl: OrbitControls,
+    camera: THREE.Camera,
+    currentAction: string
   ) {
     this.model = model;
     this.mixer = mixer;
@@ -46,12 +46,13 @@ export class Controller {
     this.updateCameraTarget(0, 0);
   }
 
- switchRunToggle() {
+  public switchRunToggle() {
     this.toggleRun = !this.toggleRun;
   }
 
-  update(delta, keysPressed) {
-    console.log(  this.model.position)
+  public update(delta: number, keysPressed: any) {
+    console.log(this.model.position)
+    // this.camera.position.set(this.model.position.x,this.model.position.y,this.model.position.z)
     const directionPressed = DIRECTIONS.some((key) => keysPressed[key] == true);
 
     var play = "";
@@ -64,10 +65,10 @@ export class Controller {
     }
 
     if (this.currentAction != play) {
-      const toPlay = this.animationsMap.get(play);
+      const toPlay = this.animationsMap.get(play) as THREE.AnimationAction;
       const current = this.animationsMap.get(
         this.currentAction
-      );
+      ) as THREE.AnimationAction;
 
       current.fadeOut(this.fadeDuration);
       toPlay.reset().fadeIn(this.fadeDuration).play();
@@ -112,7 +113,7 @@ export class Controller {
     }
   }
 
-  updateCameraTarget(moveX, moveZ) {
+  private updateCameraTarget(moveX: number, moveZ: number) {
     // move camera
     this.camera.position.x += moveX;
     this.camera.position.z += moveZ;
@@ -124,7 +125,7 @@ export class Controller {
     this.orbitControl.target = this.cameraTarget;
   }
 
-  directionOffset(keysPressed) {
+  private directionOffset(keysPressed: any) {
     var directionOffset = 0; // w
 
     if (keysPressed[W]) {
